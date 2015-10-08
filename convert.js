@@ -2,7 +2,8 @@ var xml2js = require('xml2js');
 var fs = require('graceful-fs');
 var util = require('util');
 var toMarkdown = require('to-markdown');
-var http = require('http');
+//var http = require('http');
+var request = require('request');
 
 processExport();
 
@@ -145,12 +146,18 @@ function downloadFile(url, path) {
 	if (url.indexOf("https:")  == -1) {
 		if (url.indexOf(".jpg") >=0 || url.indexOf(".png") >=0 || url.indexOf(".png") >=0) {
 			var file = fs.createWriteStream(path).on('open', function() {
-				var request = http.get(url, function(response) {
+				request.get(url).on('error', function(err) {
+    				console.log(err)
+  				}).pipe(
+					fs.createWriteStream(path)
+				);
+				/*var request = http.get(url, function(response) {
 					console.log("Response code: " + response.statusCode);
 					response.pipe(file);
 				}).on('error', function(err) {
 					console.log('error downloading url: ' + url + ' to ' + path);
 				});
+				*/
 			}).on('error', function(err) {
 				console.log('error downloading url2: ' + url + ' to ' + path);
 				console.log(err);
